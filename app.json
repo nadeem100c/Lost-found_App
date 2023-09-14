@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ]
+    ],
+    "userInterfaceStyle": "automatic",
+    "name": "Lost-and-Found",
+    "slug": "Lost-and-Found",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "1faac820-b784-4d4d-be94-c914c4e5faf6"
+      }
+    },
+    "owner": "nadeem90c",
+    "android": {
+      "package": "com.nadeem90c.LostandFound"
+    }
+  }
+}
