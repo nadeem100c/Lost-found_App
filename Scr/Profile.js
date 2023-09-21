@@ -26,8 +26,8 @@ function App() {
       quality: 1,
     });
 
-    if (!result.canceled) {
-      setImageUri(result.uri);
+    if (!result.canceled) { // Change "cancelled" to "canceled"
+      setImageUri(result.assets[0].uri); // Use "assets" array to access selected assets
     }
   };
 

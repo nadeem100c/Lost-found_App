@@ -40,12 +40,6 @@ const UserChating = () => {
                             style={styles.callbtn}
                         />
                     </TouchableOpacity>
-                    <TouchableOpacity>
-                        <Image
-                            source={require('../assets/threedot.png')}
-                            style={styles.threedot}
-                        />
-                    </TouchableOpacity>
 
                 </View>
             </View>
@@ -59,15 +53,7 @@ const UserChating = () => {
                                 <Text style={[styles.time, { marginLeft: 5 }]}>{item.view} </Text>
                             </View>
                         </View>
-                        <View style={{ marginTop: 20, bottom: 10, marginLeft: 20 }}>
-                            <Image
-                                source={require("../assets/Replied.png")}
-                                style={styles.repled}
-                            />
-                            <Text>{item.massage}</Text>
-                            <Text>{item.time}</Text>
-
-                        </View>
+                        
                     </View>
                 )
             }

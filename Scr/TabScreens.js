@@ -1,150 +1,163 @@
-import React,{useEffect} from 'react';
-import {
-  Animated,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  Text
-} from 'react-native';
-import { CurvedBottomBarExpo } from 'react-native-curved-bottom-bar';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import Feather from '@expo/vector-icons/Feather'
-import { useNavigation } from '@react-navigation/native';
-import * as SplashScreen from 'expo-splash-screen'
+
+import React from 'react';
+import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 
 import Home from './Home';
 import MyAds from './MyAds';
 import Chat from './Chat';
 import Profile from './Profile';
+import AddPost from './AddPost';
 
-import {
-  useFonts,
-  Raleway_400Regular,
-  Raleway_500Medium,
-  Raleway_600SemiBold,
-  Raleway_700Bold,
-} from '@expo-google-fonts/raleway';
+const Tab = createBottomTabNavigator();
+const CustomTabBarButton = ({ children, onPress }) => (
+  <TouchableOpacity
+    style={{
+      top: -30,
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+    onPress={onPress}
+  >
+    <View style={{
+      width: 55,
+      height: 55,
+      borderRadius: 27,
+      backgroundColor: "#7689D6",
+      borderColor:"#ddd",
+     borderWidth:2,
+      shadowOpacity:0.3,
+      shadowRadius:3,
+      shadowOffset:{
+        height:3,
+        width:3
+      }
+    }}>
+      {children}
+    </View>
 
+  </TouchableOpacity>
+)
 export default function TabScreens() {
-
-  const navigation = useNavigation();
-  const [fontsLoaded] = useFonts({
-    Raleway_400Regular,
-    Raleway_500Medium,
-    Raleway_600SemiBold,
-    Raleway_700Bold,
-  });
-
-  useEffect(() => {
-    SplashScreen.preventAutoHideAsync();
-
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
-
-  if (!fontsLoaded) {
-    return null;
-  }
-  const _renderIcon = (routeName, selectedTab) => {
-    let icon = '';
-
-    switch (routeName) {
-      case 'Home':
-        icon = 'ios-home-outline';
-        break;
-      case 'MyAds':
-        icon = 'megaphone';
-        break;
-      case 'Chat':
-        icon = 'chatbubble-ellipses-outline';
-        break;
-      case 'Profile':
-        icon = 'person-outline';
-        break;
-    }
-
-    return (
-      <View>
-        <Ionicons
-          name={icon}
-          size={25}
-          color={routeName === selectedTab ? '#7689D6' : '#BDBDBD'}
-        />
-      </View>
-    );
-  };
-
-  const renderTabBar = ({ routeName, selectedTab, navigate, }) => {
-    return (
-      <TouchableOpacity
-        onPress={() => navigate(routeName)}
-        style={styles.tabbarItem}
-      >
-        <View style={styles.iconContainer}>
-          {_renderIcon(routeName, selectedTab)}
-          <Text style={[styles.tabLabel, { color: routeName === selectedTab ? '#7689D6' : '#BDBDBD' }]}>
-            {routeName}
-          </Text>
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
   return (
-    <CurvedBottomBarExpo.Navigator
-      type="DOWN"
-      style={styles.bottomBar}
-      shadowStyle={styles.shawdow}
-      height={55}
-      circleWidth={50}
-      bgColor="#FFFFFF"
-      initialRouteName="Home"
-      borderTopLeftRight
+    <Tab.Navigator
       screenOptions={{
-        headerShown: false,
+        tabBarIcon: () => null,
+        tabBarLabel: '',
+        style: {
+          position: "absolute",
+          evelation: 3,
+          borderRadius: 25,
+          height: 70,
+          left: 5,
+          right: 5
+        }
       }}
-
-      renderCircle={({ selectedTab, navigate }) => (
-        <Animated.View style={styles.btnCircleUp}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("addpost")}
-          >
-            <Feather name={'plus'} color="#7689D6" size={25}
-              style={{ backgroundColor: "white", borderRadius: 4, }}
-            />
-          </TouchableOpacity>
-        </Animated.View>
-      )}
-      tabBar={renderTabBar}
     >
-      <CurvedBottomBarExpo.Screen
-        name="Home"
-        position="LEFT"
-        component={() => <Home />}
+      <Tab.Screen name="Home" component={Home}
+        options={{
+          headerShown: false, tabBarIcon: ({ focused }) => (
+            <View style={{ alignItems: "center", justifyContent: "center", top: 10 }}>
+              <Image source={require("../assets/Home.png")}
+                resizeMode="contain"
+                style={{
+                  height: 22,
+                  width: 22,
+                  tintColor: focused ? "#7689D6" : "#748c94",
+                }}
+              />
+              <Text style={{ color: focused ? "#7689D6" : "#748c94", fontSize: 10 }}>
+                Home
+              </Text>
+            </View>
+          )
+        }}
       />
-      <CurvedBottomBarExpo.Screen
-        name="MyAds"
-        component={() => <MyAds />}
-        position="LEFT"
+      <Tab.Screen name="MyAds" component={MyAds}
+        options={{
+          headerShown: false, tabBarIcon: ({ focused }) => (
+            <View style={{ alignItems: "center", justifyContent: "center", top: 10 }}>
+              <Image source={require("../assets/AdsIcon.png")}
+                resizeMode="contain"
+                style={{
+                  height: 22,
+                  width: 22,
+                  tintColor: focused ? "#7689D6" : "#748c94",
+                }}
+              />
+              <Text style={{ color: focused ? "#7689D6" : "#748c94", fontSize: 10 }}>
+                My Ads
+              </Text>
+            </View>
+          )
+        }}
       />
-      <CurvedBottomBarExpo.Screen
-        name="Chat"
-        component={() => <Chat />}
-        position="RIGHT"
+      <Tab.Screen name='addpost' component={AddPost}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <View>
+              <Image
+                source={require("../assets/PlusButton.png")}
+                resizeMode="contain"
+                style={{
+                  height: 22,
+                  width: 22,
+                  top:7
+                }}
+              />
+            </View>
+
+          ),
+          tabBarButton: (props) => (
+            <CustomTabBarButton {...props} />
+          )
+        }}
       />
-      <CurvedBottomBarExpo.Screen
-        name="Profile"
-        component={() => <Profile />}
-        position="RIGHT"
+      <Tab.Screen name="Chat" component={Chat}
+        options={{
+          headerShown: false, tabBarIcon: ({ focused }) => (
+            <View style={{ alignItems: "center", justifyContent: "center", top: 10 }}>
+              <Image source={require("../assets/Chat.png")}
+                resizeMode="contain"
+                style={{
+                  height: 22,
+                  width: 22,
+                  tintColor: focused ? "#7689D6" : "#748c94",
+                }}
+              />
+              <Text style={{ color: focused ? "#7689D6" : "#748c94", fontSize: 10 }}>
+                Chat
+              </Text>
+            </View>
+          )
+        }}
+      />
+      <Tab.Screen name="Profile" component={Profile}
+        options={{
+          headerShown: false, tabBarIcon: ({ focused }) => (
+            <View style={{ alignItems: "center", justifyContent: "center", top: 10 }}>
+              <Image source={require("../assets/Profile.png")}
+                resizeMode="contain"
+                style={{
+                  height: 22,
+                  width: 22,
+                  tintColor: focused ? "#7689D6" : "#748c94",
+                }}
+              />
+              <Text style={{ color: focused ? "#7689D6" : "#748c94", fontSize: 10 }}>
+                Profile
+              </Text>
+            </View>
+          )
+        }}
       />
 
-    </CurvedBottomBarExpo.Navigator>
-
+    </Tab.Navigator>
   );
 }
+
 
 export const styles = StyleSheet.create({
   container: {
@@ -210,6 +223,35 @@ export const styles = StyleSheet.create({
   },
   tabLabel: {
     fontSize: 12,
-    fontFamily:"Raleway_500Medium"
+    fontFamily: "Raleway_500Medium"
   },
+  bottomBar: {
+    backgroundColor: '#FFFFFF',
+  },
+  text: {
+    fontFamily: 'Ionicons',
+    fontSize: 16,
+    // ... other styles
+  },
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  shawdow: {
+    shadowColor: '#DDDDDD',
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 1,
+    shadowRadius: 5,
+  },
+  button: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  bottomBar: {
+    backgroundColor: '#FFFFFF',
+  },
+
 });

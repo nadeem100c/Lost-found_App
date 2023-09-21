@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, Image, ScrollView, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, Image, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as SplashScreen from 'expo-splash-screen'
 import {
@@ -130,7 +130,6 @@ const ElectronicsScreen = () => {
     },
   ];
 
-
   const renderItem = ({ item }) => {
     return (
       <View style={styles.itemContainer}>
@@ -171,8 +170,6 @@ const ElectronicsScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
-
-
     )
   }
 
@@ -238,13 +235,13 @@ const styles = StyleSheet.create({
     borderBottomColor: '#E0E0E0',
   },
   image: {
-    height: "100%",
+    height:200,
     width: "100%",
     borderRadius: 8,
   },
   image2: {
     width: "100%",
-    height: "100%",
+    height: 200,
     position: "absolute",
     borderRadius: 8
   },
@@ -255,14 +252,14 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     lineHeight: 16,
     left: 10,
-    bottom: 45,
+    bottom: 40,
     fontFamily:"Raleway_500Medium",
 
   },
   type: {
     fontSize: 10,
     position: "absolute",
-    backgroundColor: "#D7D7D7",
+    backgroundColor: "#3D3D3D",
     width: 35,
     height: 22,
     borderRadius: 8,
@@ -279,7 +276,7 @@ const styles = StyleSheet.create({
     color: '#D7D7D7',
     position: "absolute",
     right: 9,
-    bottom: 45,
+    bottom: 40,
     fontFamily:"Raleway_400Regular"
   },
   detailsbtn: {
@@ -291,7 +288,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     left: 8,
-    bottom: 9
+    bottom: 1
   },
   heading: {
     fontSize: 12,

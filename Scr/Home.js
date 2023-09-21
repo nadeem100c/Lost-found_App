@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-    View, Text,TouchableOpacity, Image, TextInput, ScrollView, StyleSheet,} from 'react-native';
+    View, Text, TouchableOpacity, Image, TextInput, ScrollView, StyleSheet,
+} from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import Jewelry from './Jewelry';
 import ButtonList from './ButtonList';
@@ -57,17 +58,17 @@ const Home = () => {
             <SafeAreaView >
                 <Text style={styles.locationtxt}>Location</Text>
                 <View style={{ flexDirection: 'row', }}>
-                    <TouchableOpacity style={{ left: 20 }}>
+                    <View style={{ left: 16}}>
                         <Text style={styles.pickerValue} > {selectedValue}</Text>
-                    </TouchableOpacity>
+                    </View>
 
                     <View style={styles.picker}>
                         <Picker
                             selectedValue={selectedValue}
                             onValueChange={handleValueChange}
                             mode="dropdown"
-                            style = {{fontFamily:"Urbanist_500Medium"}}
-                            >
+                            style={{ fontFamily: "Urbanist_500Medium" }}
+                        >
                             <Picker.Item label="Pakistan" value="Pakistan" />
                             <Picker.Item label="China" value="China" />
                             <Picker.Item label="America" value="America" />
@@ -109,13 +110,13 @@ const Home = () => {
                     </TouchableOpacity>
                 </View>
 
-                <View style={{ marginLeft: 28, marginTop: 11 }}>
+                <View style={{ marginLeft: 16, marginTop: 11 }}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                         <ButtonList onPress={handleButtonPress} />
                     </ScrollView>
                 </View>
 
-                <View style={{ marginLeft: 28, marginTop: 20 }}>
+                <View style={{ marginLeft: 16, marginTop: 20 }}>
                     {activeScreen === 'Electronic' && <ElectronicsScreen />}
                     {activeScreen === 'jewelry' && <Jewelry />}
                     {activeScreen === 'Bag' && <BagsScreen />}
@@ -131,7 +132,7 @@ export default Home;
 
 const styles = StyleSheet.create({
     locationtxt: {
-        marginLeft: 28,
+        marginLeft: 20,
         color: '#838383',
         fontSize: 12,
         height: 14,
@@ -141,12 +142,12 @@ const styles = StyleSheet.create({
     notificationicon: {
         height: 21,
         width: 17,
-        right: 23,
+        right: 17,
     },
     searchbar: {
-        marginLeft: 27,
+        marginLeft: 16,
         height: 37,
-        width: '77%',
+        width: '82%',
         backgroundColor: '#E8ECF4',
         borderRadius: 8,
         paddingLeft: 40,
@@ -155,7 +156,7 @@ const styles = StyleSheet.create({
         height: 14,
         width: 14,
         position: 'absolute',
-        left: 45,
+        left: 38,
         marginTop: 12
     },
     filtericon: {
@@ -165,10 +166,11 @@ const styles = StyleSheet.create({
     Electronicsbtn: {
         marginTop: 20,
         marginLeft: 28,
+        width: 20
     },
     picker: {
         width: 27,
-        marginLeft: "7%",
+        marginLeft: "5%",
         position: "relative",
         bottom: 10,
         borderRadius: 10,
@@ -188,12 +190,13 @@ const styles = StyleSheet.create({
         height: 60,
         width: 60,
         position: 'absolute',
-        top: 100,
+        top: 110,
         left: 20,
+        bottom: "15%"
     },
     overlayContainer: {
         position: 'absolute',
-        top: 590,
+        top: 570,
         left: "76%",
         zIndex: 1,
     },
