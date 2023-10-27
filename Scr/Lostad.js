@@ -1,49 +1,86 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput } from 'react-native'
-import React, { useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useNavigation } from '@react-navigation/native'
-import DateTimePickerModal from "react-native-modal-datetime-picker";
+import React, { useState } from 'react';
+import {
+    StyleSheet,
+    Text,
+    View,
+    TouchableOpacity,
+    Image,
+    TextInput,
+    FlatList,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 const Lostad = (time) => {
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedTime, setSelectedTime] = useState('');
+    const [searchCategory, setSearchCategory] = useState('');
+    const [categories, setCategories] = useState([
+        'Electronic',
+        'Jewelry',
+        'Bag',
+        'Wallet',
+        'Glasses',
 
+    ]);
+    const [isCategoryListVisible, setIsCategoryListVisible] = useState(false);
 
+    const handleSearchCategory = (text) => {
+        setSearchCategory(text);
+        setIsCategoryListVisible(true);
+    };
 
+    const handleCategorySelect = (category) => {
+        setSearchCategory(category);
+        setIsCategoryListVisible(false);
+    };
+
+    // const filteredCategories = categories.filter((category) =>
+    //     category.toLowerCase().includes(searchCategory.toLowerCase())
+    // );
+    const handleInputonBlur = () => {
+        setIsCategoryListVisible(false)
+    }
+    const navigation = useNavigation();
+    const handlebackbtn = () => {
+        navigation.goBack();
+    };
+    
     const showDatePicker = () => {
         setDatePickerVisibility(true);
     };
+
     const hideDatePicker = () => {
         setDatePickerVisibility(false);
     };
+
     const handleConfirm = (date) => {
-        setSelectedDate(date)
+        setSelectedDate(date);
         hideDatePicker();
     };
 
-
-    const navigation = useNavigation()
-    const handlebackbtn = () => {
-        navigation.goBack()
-    }
     const showTimePicker = () => {
         setTimePickerVisibility(true);
     };
+
     const hideTimePicker = () => {
         setTimePickerVisibility(false);
     };
+
     const handleConfirmTime = (time) => {
-        setSelectedTime(time)
+        setSelectedTime(time);
         hideTimePicker();
     };
 
+    // ...
     return (
         <SafeAreaView>
             <View style={styles.btnView}>
                 <TouchableOpacity onPress={handlebackbtn}>
-                    <Image source={require("../assets/backbtn.png")} style={styles.backbtn} />
+                    <Image source={require('../assets/backbtn.png')} style={styles.backbtn} />
                 </TouchableOpacity>
                 <Text style={styles.title}>Lost Post</Text>
             </View>
@@ -53,70 +90,58 @@ const Lostad = (time) => {
             </View>
 
             <View style={{ flexDirection: 'row' }}>
-
                 <TextInput
-                    placeholder='Search Category'
+                    placeholder="Search Category"
                     style={styles.searchbar}
+                    value={searchCategory}
+                    onChangeText={handleSearchCategory}
+                    onFocus = {handleSearchCategory}
                 />
-                <Image
-                    source={require('../assets/Searchicon.png')}
-                    style={styles.searbaricon}
-                />
+                <Image source={require('../assets/Searchicon.png')} style={styles.searbaricon} />
             </View>
 
-            <View style={styles.categorytxt}>
-                <Text style={styles.txt}>Location</Text>
-            </View>
-
-            <View style={{ flexDirection: 'row' }}>
-
-                <TextInput
-                    placeholder='Search Location'
-                    style={styles.searchbar}
+            {isCategoryListVisible && (
+                <FlatList
+                    data={categories}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity
+                            onPress={() => handleCategorySelect(item)}
+                        >
+                            <Text style={styles.categoryItem}>{item}</Text>
+                        </TouchableOpacity>
+                    )}
+                    keyExtractor={(item) => item}
                 />
-                <Image
-                    source={require('../assets/Searchicon.png')}
-                    style={styles.searbaricon}
-                />
-            </View>
+            )}
 
             <View style={styles.datetime}>
-                <View style={{ alignItems: "center" }}>
-                    <Text style={[styles.txt, {}]}>Date Lost</Text>
+                <View style={{ alignItems: 'center' }}>
+                    <Text style={[styles.txt]}>Date Lost</Text>
                 </View>
 
-                <View style={{ width: "50%" }}>
+                <View style={{ width: '50%' }}>
                     <Text style={[styles.txt]}>Time Lost</Text>
                 </View>
             </View>
 
             <View style={styles.boxContainer}>
                 <View style={styles.boxContainer}>
-                    <TouchableOpacity style={styles.datebox}
-                        onPress={showDatePicker}
-                    >
-                        <Image source={require("../assets/calendar.png")}
-                            style={styles.calenderimg}
-                        />
-                        <Text style={styles.boxtxt}>{selectedDate ? selectedDate.toDateString() : 'Select Date'}</Text>
-                        <Image source={require("../assets/dropdown.png")}
-                            style={styles.dropdown} />
+                    <TouchableOpacity style={styles.datebox} onPress={showDatePicker}>
+                        <Image source={require('../assets/calendar.png')} style={styles.calenderimg} />
+                        <Text style={styles.boxtxt}>
+                            {selectedDate ? selectedDate.toDateString() : 'Select Date'}
+                        </Text>
+                        <Image source={require('../assets/dropdown.png')} style={styles.dropdown} />
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.datebox}
-                        onPress={showTimePicker}
-                    >
-                        <Image source={require("../assets/time.png")}
-                            style={styles.calenderimg}
-                        />
-                        <Text style={styles.boxtxt}>{selectedTime ? selectedTime.toLocaleTimeString() : "Select Time"}</Text>
-                        <Image source={require("../assets/dropdown.png")}
-                            style={styles.dropdown} />
+                    <TouchableOpacity style={styles.datebox} onPress={showTimePicker}>
+                        <Image source={require('../assets/time.png')} style={styles.calenderimg} />
+                        <Text style={styles.boxtxt}>
+                            {selectedTime ? selectedTime.toLocaleTimeString() : 'Select Time'}
+                        </Text>
+                        <Image source={require('../assets/dropdown.png')} style={styles.dropdown} />
                     </TouchableOpacity>
                 </View>
-
-
-
             </View>
 
             <DateTimePickerModal
@@ -131,13 +156,14 @@ const Lostad = (time) => {
                 onConfirm={handleConfirmTime}
                 onCancel={hideTimePicker}
             />
-            <TouchableOpacity style={styles.nextbtn} onPress={() => navigation.navigate("publishLost")}>
+            <TouchableOpacity style={styles.nextbtn} onPress={() => navigation.navigate('publishLost')}>
                 <Text style={styles.nexttxt}>Next</Text>
             </TouchableOpacity>
         </SafeAreaView>
-    )
-}
+    );
+    // ...
 
+}
 export default Lostad
 
 const styles = StyleSheet.create({
@@ -238,5 +264,12 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: '600'
 
-    }
+    },
+    categoryItem: {
+        marginLeft: 27,
+        fontSize: 14,
+        paddingVertical: 8,
+        borderBottomWidth: 1,
+        borderColor: '#E8ECF4',
+    },
 })

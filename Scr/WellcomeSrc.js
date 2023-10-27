@@ -10,15 +10,15 @@ import {
   Urbanist_700Bold,
 } from '@expo-google-fonts/urbanist';
 
-const WellcomeSrc = ({ navigation }) => {
-
+const WellcomeSrc = ({ navigation, route }) => {
+  const { user } = route.params; // Access the user prop from route.params
   const [fontsLoaded] = useFonts({
     Urbanist_300Light,
     Urbanist_400Regular,
     Urbanist_500Medium,
     Urbanist_600SemiBold,
     Urbanist_700Bold,
-});
+  });
   useEffect(() => {
     SplashScreen.preventAutoHideAsync();
 
@@ -46,14 +46,17 @@ const WellcomeSrc = ({ navigation }) => {
         </Text>
       </View>
 
-      <TouchableOpacity style={styles.loginbtn}
+      <TouchableOpacity
+        style={styles.loginbtn}
         onPress={() => {
-          navigation.navigate("login")
+          if (user) {
+            navigation.navigate('login');
+          } else {
+            navigation.navigate('Tabs');
+          }
         }}
       >
-        <Text style={styles.btntext}>
-          Login
-        </Text>
+        <Text style={styles.btntext}>Login</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.rigisterbtn}
@@ -127,7 +130,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
     fontFamily: "Urbanist_600SemiBold"
 
- 
+
 
   },
   btntext: {

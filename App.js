@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import WellcomeSrc from './Scr/WellcomeSrc';
@@ -20,22 +20,41 @@ import Notification from './Scr/Notification';
 import MapSrc from './Scr/MapSrc';
 import ItemDetailsSrc from './Scr/ItemDetailsSrc';
 import UserChating from './Scr/UserChating';
+import { firebase } from './config'
 
 const Stack = createStackNavigator();
 
 const App = () => {
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState("");
+
+  function onAuthStateChanged(user) {
+    setUser(user);
+    if (initializing) setInitializing(false);
+  }
+
+  useEffect(() => {
+    const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber;
+  }, []);
+
+  if (initializing) {
+    return null;
+  }
+
+
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName='Tabs'>
-        <Stack.Screen name="wellcome" component={WellcomeSrc} options={{ headerShown: false }} />
+      <Stack.Navigator initialRouteName={"lostad"}>
         <Stack.Screen name="login" component={LoginSrc} options={{ headerShown: false }} />
-        <Stack.Screen name="filters" component={FiltersScreens} options={{ headerShown: false }} />
-        <Stack.Screen name='Tabs' component={TabScreens} options={{ headerShown: false }} />
-        <Stack.Screen name='registersrc' component={RegisterScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Welcome" component={WellcomeSrc} initialParams={{ user }} options={{ headerShown: false }} />
+        <Stack.Screen name="registersrc" component={RegisterScreen} options={{ headerShown: false }} />
         <Stack.Screen name='forgetpassword' component={ForgetPassword} options={{ headerShown: false }} />
         <Stack.Screen name='passwordotp' component={PasswordOtp} options={{ headerShown: false }} />
         <Stack.Screen name='newpassword' component={Newpassword} options={{ headerShown: false }} />
         <Stack.Screen name='changedpassword' component={Changedpassword} options={{ headerShown: false }} />
+        <Stack.Screen name="Tabs" component={TabScreens} options={{ headerShown: false }} />
+        <Stack.Screen name="filters" component={FiltersScreens} options={{ headerShown: false }} />
         <Stack.Screen name='addpost' component={AddPost} options={{ headerShown: false }} />
         <Stack.Screen name='lostad' component={Lostad} options={{ headerShown: false }} />
         <Stack.Screen name='foundad' component={Foundad} options={{ headerShown: false }} />
@@ -46,8 +65,43 @@ const App = () => {
         <Stack.Screen name='mapSrc' component={MapSrc} options={{ headerShown: false }} />
         <Stack.Screen name='itemDetails' component={ItemDetailsSrc} options={{ headerShown: false }} />
         <Stack.Screen name='userChating' component={UserChating} options={{ headerShown: false }} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
 export default App;
+
+
+
+
+// <Stack.Navigator initialRouteName={user ? "Tabs" : "wellcome"}>
+
+// {
+//   user ? (
+//     <>
+//       <Stack.Screen name="Tabs" component={TabScreens} options={{ headerShown: false }} />
+//       <Stack.Screen name="filters" component={FiltersScreens} options={{ headerShown: false }} />
+//       <Stack.Screen name='addpost' component={AddPost} options={{ headerShown: false }} />
+//       <Stack.Screen name='lostad' component={Lostad} options={{ headerShown: false }} />
+//       <Stack.Screen name='foundad' component={Foundad} options={{ headerShown: false }} />
+//       <Stack.Screen name='details' component={DetailsSrc} options={{ headerShown: false }} />
+//       <Stack.Screen name='publishLost' component={PublishLostsrc} options={{ headerShown: false }} />
+//       <Stack.Screen name='myads' component={MyAds} options={{ headerShown: false }} />
+//       <Stack.Screen name='notications' component={Notification} options={{ headerShown: false }} />
+//       <Stack.Screen name='mapSrc' component={MapSrc} options={{ headerShown: false }} />
+//       <Stack.Screen name='itemDetails' component={ItemDetailsSrc} options={{ headerShown: false }} />
+//       <Stack.Screen name='userChating' component={UserChating} options={{ headerShown: false }} />
+//     </>
+//   ) : (
+//     <><Stack.Screen name="login" component={LoginSrc} options={{ headerShown: false }} />
+//       <Stack.Screen name="Welcome" component={WellcomeSrc} initialParams={{ user }} options={{ headerShown: false }} />
+//       <Stack.Screen name="registersrc" component={RegisterScreen} options={{ headerShown: false }} />
+//       <Stack.Screen name='forgetpassword' component={ForgetPassword} options={{ headerShown: false }} />
+//       <Stack.Screen name='passwordotp' component={PasswordOtp} options={{ headerShown: false }} />
+//       <Stack.Screen name='newpassword' component={Newpassword} options={{ headerShown: false }} />
+//       <Stack.Screen name='changedpassword' component={Changedpassword} options={{ headerShown: false }} />
+//     </>
+//   )
+// }
+// </Stack.Navigator>

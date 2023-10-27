@@ -2,6 +2,9 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput } from 'reac
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import * as SplashScreen from 'expo-splash-screen'
+import { firebase } from '../config'
+
+
 import {
     useFonts,
     Urbanist_300Light,
@@ -12,7 +15,21 @@ import {
 } from '@expo-google-fonts/urbanist';
 
 const LoginSrc = ({ navigation }) => {
+
     const [passwordVisible, setPasswordVisible] = useState(false)
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const loginUser = async (email, password) => {
+        try {
+            await firebase.auth().signInWithEmailAndPassword(email, password);
+            navigation.navigate('Tabs');
+        } catch (error) {
+            console.warn('Login Error:', error);
+            alert(error.message);
+        }
+    }
+
     const [fontsLoaded] = useFonts({
         Urbanist_300Light,
         Urbanist_400Regular,
@@ -53,28 +70,27 @@ const LoginSrc = ({ navigation }) => {
                         {
                             alignSelf: "center",
                             fontFamily: "Urbanist_600SemiBold"
-                            
+
                         }]}>
                     see you, Again!
                 </Text>
                 <View style={styles.input}>
                     <TextInput
-                        placeholder='Enter your email'
-                        style={{
-                            paddingLeft: 17,
-                            paddingTop: 18,
-                        }}
+                        style={styles.textinput}
+                        placeholder="Email"
+                        onChangeText={(email) => setEmail(email)}
+                        autoCapitalize="none"
+                        autoCorrect={false}
                     />
                 </View>
                 <View style={styles.passwordinput}>
                     <TextInput
-                        placeholder='Enter your password'
-                        secureTextEntry={!passwordVisible}
-                        style={{
-                            paddingLeft: 17,
-                            paddingTop: 18,
-
-                        }}
+                        style={styles.textinput}
+                        placeholder="Password"
+                        onChangeText={(password) => setPassword(password)}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        secureTextEntry={true}
                     />
 
                 </View>
@@ -103,9 +119,7 @@ const LoginSrc = ({ navigation }) => {
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.loginbtn2}
-                    onPress={() => {
-                        navigation.navigate("Tabs")
-                    }}
+                    onPress={() => loginUser(email, password)}
                 >
                     <Text style={styles.loginbtn}>
                         Login

@@ -3,9 +3,9 @@ import { View, Image, Button, StyleSheet, Text, TouchableOpacity } from 'react-n
 import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-function App() {
+function Profile() {
   const [imageUri, setImageUri] = useState(null);
-  const Username = "Sam"
+  const Username = { firstName }
   const Points = 1234
   useEffect(() => {
     (async () => {
@@ -97,7 +97,7 @@ function App() {
     </SafeAreaView>
   );
 }
-export default App;
+export default Profile;
 const styles = StyleSheet.create({
   cameraicon: {
     height: 35,
