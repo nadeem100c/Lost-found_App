@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity, Dimensions, TextInput, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation  } from '@react-navigation/native'
 import DoubleSlider from './DoubleSlider'
 import * as SplashScreen from 'expo-splash-screen'
 import {
@@ -17,9 +17,11 @@ const buttonWidth = Dimensions.get('window').width
 const multiuttonWidth = Dimensions.get('window').width
 
 const FiltersScreens = () => {
-
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedbg, setselectedbg] = useState(null)
   const [selectedSearchType, setSelectedSearchType] = useState(null);
+  const [location, setLocation] = useState('');
+
   const navigation = useNavigation()
   const [fontsLoaded] = useFonts({
     Urbanist_300Light,
@@ -37,6 +39,7 @@ const FiltersScreens = () => {
     }
   }, [fontsLoaded]);
 
+
   if (!fontsLoaded) {
     return null;
   }
@@ -48,12 +51,69 @@ const FiltersScreens = () => {
     navigation.goBack()
   }
 
+  const categories = ["All", "bag", "wallet", "Electronic", "Jewelry", "Glasses"];
+
   const HandlebtnBG = (buttonindexing) => {
     setselectedbg(buttonindexing)
   }
   const handleSearchTypeButtonPress = (buttonIndex) => {
     setSelectedSearchType(buttonIndex);
   };
+
+  const applyFilters = () => {
+    let selectedType = null;
+    let selectedCategoryName = null;
+
+    if (selectedbg !== null && selectedbg < categories.length) {
+      selectedCategoryName = categories[selectedbg];
+    }
+    console.log('Selected Type:', selectedType);
+    console.log('Selected Category:', selectedCategoryName);
+    console.log('Selected Location:', location);
+    if (selectedSearchType === 11) {
+      selectedType = 'Lost';
+    } else if (selectedSearchType === 12) {
+      selectedType = 'Found';
+    }
+
+    navigation.navigate('Tabs', {
+      screen: 'Home',
+      params: {
+        searchType: selectedType,
+        category: selectedbg !== null ? categories[selectedbg] : null,
+        location: location,
+      },
+    });
+  };
+
+  const handleLocationChange = (text) => {
+    setLocation(text);
+  };
+
+  const resetFilters = () => {
+    // Display an alert to confirm the reset action
+    alert(
+      "Reset Filters",
+      "Are you sure you want to reset all filters?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Reset",
+          onPress: () => {
+            setSelectedCategory(null);
+            setselectedbg(null);
+            setSelectedSearchType(null);
+            setLocation('');
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View>
@@ -97,8 +157,8 @@ const FiltersScreens = () => {
         <View style={styles.date}>
           <Text style={styles.datetxt}>Date</Text>
         </View>
-        <View style={{alignSelf:"center",height:30}}>
-          <DoubleSlider/>
+        <View style={{ alignSelf: "center", height: 30 }}>
+          <DoubleSlider />
         </View>
         <View style={{ marginTop: 28, marginLeft: 28, flexDirection: "row", justifyContent: "space-between" }}>
           <Text style={{ fontFamily: "Urbanist_500Medium" }}>today</Text>
@@ -134,7 +194,7 @@ const FiltersScreens = () => {
           <TouchableOpacity style={[styles.LostFountbtn, { width: multibtn }, selectedbg === 3 ? styles.buttonbg : {}]}
             onPress={() => { HandlebtnBG(3) }}
           >
-            <Text style={styles.btntxt}>mobile</Text>
+            <Text style={styles.btntxt}>Electronic</Text>
           </TouchableOpacity>
 
         </View>
@@ -142,19 +202,16 @@ const FiltersScreens = () => {
           <TouchableOpacity style={[styles.LostFountbtn, { width: multibtn }, selectedbg === 4 ? styles.buttonbg : {}]}
             onPress={() => { HandlebtnBG(4) }}
           >
-            <Text style={styles.btntxt}>Pet</Text>
+            <Text style={styles.btntxt}>Jewelry</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.LostFountbtn, { width: multibtn }, selectedbg === 5 ? styles.buttonbg : {}]}
             onPress={() => { HandlebtnBG(5) }}
           >
-            <Text style={styles.btntxt}>makeup</Text>
+            <Text style={styles.btntxt}>Glasses</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.LostFountbtn, { width: multibtn }, selectedbg === 6 ? styles.buttonbg : {}]}
-            onPress={() => { HandlebtnBG(6) }}>
-            <Text style={styles.btntxt}>laptop</Text>
-          </TouchableOpacity>
+
         </View>
         <View style={{ marginLeft: 28, marginTop: 19 }}>
           <Text style={{ fontSize: 12, fontFamily: "Urbanist_500Medium", lineHeight: 14 }}>Location</Text>
@@ -163,8 +220,9 @@ const FiltersScreens = () => {
         <View style={{ flexDirection: 'row' }}>
 
           <TextInput
-            placeholder='Search something here'
+            placeholder='Location search '
             style={styles.searchbar}
+            onChangeText={handleLocationChange}
           />
           <Image
             source={require('../assets/Searchicon.png')}
@@ -172,11 +230,15 @@ const FiltersScreens = () => {
           />
         </View>
         <TouchableOpacity style={styles.loginbtn}
-          onPress={() =>
-            Alert.alert("Next Screen will be Apeare Soon")
-          }
+          onPress={applyFilters}
         >
           <Text style={{ alignSelf: "center", color: "white", fontWeight: "600" }}>Apply</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.loginbtn}
+          onPress={resetFilters}
+        >
+          <Text style={{ alignSelf: "center", color: "white", fontWeight: "600" }}>Reset</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -265,8 +327,8 @@ const styles = StyleSheet.create({
   buttonbg: {
     backgroundColor: "#7689D6",
   },
-  year:{
-     fontFamily: "Urbanist_500Medium",
-     marginRight:5
-    }
+  year: {
+    fontFamily: "Urbanist_500Medium",
+    marginRight: 5
+  }
 })

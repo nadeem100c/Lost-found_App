@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { TextInput } from 'react-native-gesture-handler'
 import * as SplashScreen from 'expo-splash-screen'
-import {firebase} from '../config'
+import { firebase } from '../config'
 import {
     useFonts,
     Urbanist_300Light,
@@ -17,6 +17,7 @@ import {
 const RegisterScreen = ({ navigation }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [confirmedPassword, setConfirmedPassword] = useState("");
     const [firstName, setfirstName] = useState("");
     const [lastName, setLastName] = useState("");
 
@@ -27,33 +28,41 @@ const RegisterScreen = ({ navigation }) => {
         Urbanist_600SemiBold,
         Urbanist_700Bold,
     })
-    registrationUser = async (email, password, firstName, lastName) => {
-        await firebase.auth().createUserWithEmailAndPassword(email, password)
-            .then(() => {
-                // Send email verification
-                return firebase.auth().currentUser.sendEmailVerification({
-                    handleCodeInApp: true,
-                    url: "https://lostandfound-9b8c9.firebaseapp.com",
-                });
-            })
-            .then(() => {
-                alert("Verification email sent");
-            })
-            .then(() => {
-                // Store user data in Firestore
-                firebase.firestore().collection("UserData")
-                    .doc(firebase.auth().currentUser.uid)
-                    .set({
-                        firstName,
-                        lastName,
-                        email,
-                        password
-                    });
-            })
-            .catch((error) => {
-                alert(error.message);
+    const registrationUser = async (email, password, firstName, lastName) => {
+        if (!email || !password || !firstName || !lastName) {
+            alert("Please fill in all fields");
+            return;
+        }
+        if (password !== confirmedPassword) {
+            alert("Passwords do not match");
+            return;
+        }
+
+        try {
+            await firebase.auth().createUserWithEmailAndPassword(email, password);
+
+            const verificationUrl = "https://my-lost-and-found-5c11c.firebaseapp.com";
+            await firebase.auth().currentUser.sendEmailVerification({
+                handleCodeInApp: true,
+                url: verificationUrl,
             });
-    }
+
+            // Store user data in Firestore 
+            await firebase.firestore().collection("UserData")
+                .doc(firebase.auth().currentUser.uid)
+                .set({
+                    firstName,
+                    lastName,
+                    email,
+                    password
+                });
+
+            alert("Verification email sent and user registered!");
+        } catch (error) {
+            alert(error.message);
+        }
+    };
+
 
     useEffect(() => {
         SplashScreen.preventAutoHideAsync()
@@ -109,6 +118,16 @@ const RegisterScreen = ({ navigation }) => {
                         style={styles.textinput}
                         placeholder="Password"
                         onChangeText={(password) => setPassword(password)}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        secureTextEntry={true}
+                    />
+                </View>
+                <View style={styles.input}>
+                    <TextInput
+                        style={styles.textinput}
+                        placeholder="Confirm Password"
+                        onChangeText={(confirmedPassword) => setConfirmedPassword(confirmedPassword)}
                         autoCapitalize="none"
                         autoCorrect={false}
                         secureTextEntry={true}

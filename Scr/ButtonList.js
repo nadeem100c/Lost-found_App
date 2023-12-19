@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, Dimensions } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen'
 import {
@@ -13,7 +13,7 @@ const btnWidth = Dimensions.get("window").width
 
 export default function ButtonList({ onPress }) {
 
-  const [pressed, setPressed] = useState("Electronic");
+  const [pressed, setPressed] = useState("AllAds");
   const Width = btnWidth * 0.2
   const handlePress = (category) => {
     setPressed(category);
@@ -47,38 +47,45 @@ export default function ButtonList({ onPress }) {
   return (
     <View style={{ flexDirection: 'row' }}>
       <TouchableOpacity
+        onPress={() => handlePress('AllAds')}
+        style={getCategoryButtonStyle('AllAds')}
+      >
+        <Text style={[styles.txt, { color: pressed === "AllAds" ? "white" : "#8391A1", fontFamily: "Raleway_500Medium" }]}>All</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
         onPress={() => handlePress('Electronic')}
         style={getCategoryButtonStyle('Electronic')}
       >
-        <Text style={[styles.txt, { color: pressed === "Electronic" ? "white" : "#8391A1" ,fontFamily:"Raleway_500Medium"}]}>Electronic</Text>
+        <Text style={[styles.txt, { color: pressed === "Electronic" ? "white" : "#8391A1", fontFamily: "Raleway_500Medium" }]}>Electronic</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         onPress={() => handlePress('jewelry')}
         style={getCategoryButtonStyle('jewelry')}
       >
-        <Text style={[styles.txt, { color: pressed === "jewelry" ? "white" : "#8391A1" ,fontFamily:"Raleway_500Medium"}]}>jewelry</Text>
+        <Text style={[styles.txt, { color: pressed === "jewelry" ? "white" : "#8391A1", fontFamily: "Raleway_500Medium" }]}>jewelry</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         onPress={() => handlePress('Bag')}
         style={getCategoryButtonStyle('Bag')}
       >
-        <Text style={[styles.txt, { color: pressed === "Bag" ? "white" : "#8391A1" ,fontFamily:"Raleway_500Medium"}]}>Bag</Text>
+        <Text style={[styles.txt, { color: pressed === "Bag" ? "white" : "#8391A1", fontFamily: "Raleway_500Medium" }]}>Bag</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         onPress={() => handlePress('Wellet')}
         style={getCategoryButtonStyle('Wellet')}
       >
-        <Text style={[styles.txt, { color: pressed === "Wellet" ? "white" : "#8391A1" ,fontFamily:"Raleway_500Medium"}]}>Wellet</Text>
+        <Text style={[styles.txt, { color: pressed === "Wellet" ? "white" : "#8391A1", fontFamily: "Raleway_500Medium" }]}>Wellet</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         onPress={() => handlePress('Glasses')}
         style={getCategoryButtonStyle('Glasses')}
       >
-        <Text style={[styles.txt, { color: pressed === "Glasses" ? "white" : "#8391A1" ,fontFamily:"Raleway_500Medium"}]}>Glasses</Text>
+        <Text style={[styles.txt, { color: pressed === "Glasses" ? "white" : "#8391A1", fontFamily: "Raleway_500Medium" }]}>Glasses</Text>
       </TouchableOpacity>
     </View>
   );

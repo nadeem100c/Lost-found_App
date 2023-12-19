@@ -50,7 +50,7 @@ const LoginSrc = ({ navigation }) => {
         return null;
     }
     const toggelVisiblehandle = () => {
-        setPasswordVisible(!passwordVisible)
+        setPasswordVisible(!passwordVisible);
     }
     return (
 
@@ -90,9 +90,8 @@ const LoginSrc = ({ navigation }) => {
                         onChangeText={(password) => setPassword(password)}
                         autoCapitalize="none"
                         autoCorrect={false}
-                        secureTextEntry={true}
+                        secureTextEntry={!passwordVisible}
                     />
-
                 </View>
                 <TouchableOpacity
                     onPress={toggelVisiblehandle}
@@ -103,7 +102,7 @@ const LoginSrc = ({ navigation }) => {
                             width: 17,
                             height: 11,
                             marginLeft: "80%",
-                            bottom: 28
+                            bottom: 32
                         }}
                     />
                 </TouchableOpacity>
@@ -294,7 +293,12 @@ const styles = StyleSheet.create({
         borderBottomWidth: 2,
         width: 90,
         borderColor: "#E8ECF4"
+    },
+    textinput: {
+        paddingTop: 14,
+        paddingLeft: 10
+
     }
 
 
-})
+}) 

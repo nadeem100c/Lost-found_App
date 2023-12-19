@@ -3,7 +3,6 @@ import React from 'react';
 import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-
 import Home from './Home';
 import MyAds from './MyAds';
 import Chat from './Chat';
@@ -11,6 +10,7 @@ import Profile from './Profile';
 import AddPost from './AddPost';
 
 const Tab = createBottomTabNavigator();
+
 const CustomTabBarButton = ({ children, onPress }) => (
   <TouchableOpacity
     style={{
@@ -25,13 +25,13 @@ const CustomTabBarButton = ({ children, onPress }) => (
       height: 55,
       borderRadius: 27,
       backgroundColor: "#7689D6",
-      borderColor:"#ddd",
-     borderWidth:2,
-      shadowOpacity:0.3,
-      shadowRadius:3,
-      shadowOffset:{
-        height:3,
-        width:3
+      borderColor: "#ddd",
+      borderWidth: 2,
+      shadowOpacity: 0.3,
+      shadowRadius: 3,
+      shadowOffset: {
+        height: 3,
+        width: 3
       }
     }}>
       {children}
@@ -39,6 +39,7 @@ const CustomTabBarButton = ({ children, onPress }) => (
 
   </TouchableOpacity>
 )
+
 export default function TabScreens() {
   return (
     <Tab.Navigator
@@ -59,6 +60,7 @@ export default function TabScreens() {
         options={{
           headerShown: false, tabBarIcon: ({ focused }) => (
             <View style={{ alignItems: "center", justifyContent: "center", top: 10 }}>
+              {(props) => <Home {...props} />}
               <Image source={require("../assets/Home.png")}
                 resizeMode="contain"
                 style={{
@@ -74,6 +76,7 @@ export default function TabScreens() {
           )
         }}
       />
+
       <Tab.Screen name="MyAds" component={MyAds}
         options={{
           headerShown: false, tabBarIcon: ({ focused }) => (
@@ -93,6 +96,7 @@ export default function TabScreens() {
           )
         }}
       />
+
       <Tab.Screen name='addpost' component={AddPost}
         options={{
           headerShown: false,
@@ -104,7 +108,7 @@ export default function TabScreens() {
                 style={{
                   height: 22,
                   width: 22,
-                  top:7
+                  top: 7
                 }}
               />
             </View>
@@ -115,6 +119,7 @@ export default function TabScreens() {
           )
         }}
       />
+
       <Tab.Screen name="Chat" component={Chat}
         options={{
           headerShown: false, tabBarIcon: ({ focused }) => (
@@ -134,6 +139,7 @@ export default function TabScreens() {
           )
         }}
       />
+      
       <Tab.Screen name="Profile" component={Profile}
         options={{
           headerShown: false, tabBarIcon: ({ focused }) => (

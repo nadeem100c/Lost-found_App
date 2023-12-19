@@ -23,6 +23,9 @@
     "owner": "nadeem90c",
     "android": {
       "package": "com.nadeem90c.LostandFound"
+    },
+    "ios": {
+      "bundleIdentifier": "y"
     }
   }
 }

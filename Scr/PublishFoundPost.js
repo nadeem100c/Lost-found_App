@@ -11,13 +11,13 @@ import "firebase/compat/firestore";
 import "firebase/compat/storage";
 
 
-
 const PublishLostsrc = ({ route }) => {
 
     const { selectedTime, selectedDate, searchLocation, category } = route.params;
     const parsedSelectedTime = new Date(selectedTime)
     const parsedSelectedDate = new Date(selectedDate)
     const [loading, setLoading] = useState(false);
+
 
     const navigation = useNavigation();
     const [fontsLoaded] = useFonts({
@@ -47,7 +47,7 @@ const PublishLostsrc = ({ route }) => {
                 const imageUrl = await imageRef.getDownloadURL();
                 imageUrls.push(imageUrl);
             } else {
-                imageUrls.push(null);
+                imageUrls.push(null); // Handle cases where the image is not selected
             }
         }
 
@@ -79,7 +79,7 @@ const PublishLostsrc = ({ route }) => {
                     location: searchLocation,
                     category: category,
                     userId: userUID,
-                    type: 'Lost',
+                    type: 'Found',
                 });
 
                 alert('Item published successfully!');
@@ -123,7 +123,7 @@ const PublishLostsrc = ({ route }) => {
                 <TouchableOpacity onPress={handlebackbtn}>
                     <Image source={require('../assets/backbtn.png')} style={styles.backbtn} />
                 </TouchableOpacity>
-                <Text style={styles.title}>Lost Post</Text>
+                <Text style={styles.title}>Found Post</Text>
             </View>
 
             <View style={styles.categorytxt}>
@@ -132,7 +132,7 @@ const PublishLostsrc = ({ route }) => {
 
             <View style={{ flexDirection: 'row' }}>
                 <TextInput
-                    placeholder="Enter Lost item Name"
+                    placeholder="Enter Found item Name"
                     style={styles.searchbar}
                     onChangeText={(text) => setItemName(text)}
                 />
@@ -299,6 +299,6 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        backgroundColor: 'rgba(255, 255, 255, 0.7)', 
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
     },
 });

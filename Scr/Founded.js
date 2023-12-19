@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
     StyleSheet,
     Text,
@@ -12,14 +12,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
-const Lostad = ({ route }) => {
+const Founded = (time) => {
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedTime, setSelectedTime] = useState('');
     const [searchLocation, setSearchLocation] = useState('');
     const [searchCategory, setSearchCategory] = useState(null);
-
     const [categories, setCategories] = useState([
         'Electronic',
         'Jewelry',
@@ -30,17 +29,6 @@ const Lostad = ({ route }) => {
     ]);
 
     const [isCategoryListVisible, setIsCategoryListVisible] = useState(false);
-
-    useEffect(() => {
-        if (route.params && route.params.itemData) {
-           const { item, location } = route.params.itemData;
-            const { category } = route.params.itemData;
-            setSearchLocation(location || "agian" );
-            setSearchCategory(category || null); 
-        }
-    }, [route.params]);
-
-
 
     const handleSearchCategory = (text) => {
         setSearchCategory(text.toString());
@@ -99,7 +87,7 @@ const Lostad = ({ route }) => {
         }
 
 
-        navigation.navigate('publishLost', {
+        navigation.navigate('publishfoundpost', {
             selectedTime: selectedTime,
             selectedDate: selectedDate,
             searchLocation: searchLocation,
@@ -114,7 +102,7 @@ const Lostad = ({ route }) => {
                 <TouchableOpacity onPress={handlebackbtn}>
                     <Image source={require('../assets/backbtn.png')} style={styles.backbtn} />
                 </TouchableOpacity>
-                <Text style={styles.title}>Lost Post</Text>
+                <Text style={styles.title}>Found Post</Text>
             </View>
 
             <View style={styles.categorytxt}>
@@ -213,7 +201,7 @@ const Lostad = ({ route }) => {
     // ...
 
 }
-export default Lostad
+export default Founded
 
 const styles = StyleSheet.create({
     btnView: {

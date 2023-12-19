@@ -1,220 +1,246 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native'
-import React, { useEffect } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useNavigation } from '@react-navigation/native'
-import * as SplashScreen from 'expo-splash-screen'
-import {
-  useFonts,
-  Urbanist_300Light,
-  Urbanist_400Regular,
-  Urbanist_500Medium,
-  Urbanist_600SemiBold,
-  Urbanist_700Bold,
-} from '@expo-google-fonts/urbanist';
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet, Image, TextInput } from 'react-native';
+import { firebase } from '../config';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 
-const Chat = () => {
-  const navigation = useNavigation()
-  const Array = [
-    {
-      id: 1,
-      Name: "Theresa ",
-      TextDemo: "Okay, i’ll work on it when it’s...",
-      Time: "06.21",
-      masgCOunt: "4",
-      MassageBadge: require("../assets/massageBadge.png"),
-      profileImage: require('../assets/profileimage.png'),
-      activeBadge: require('../assets/activeBadge.png'),
-    },
-    {
-      id: 2,
-      Name: "Theresa ",
-      TextDemo: "Okay, i’ll work on it when it’s...",
-      Time: "06.21",
-      masgCOunt: "4",
-      MassageBadge: require("../assets/massageBadge.png"),
-      profileImage: require('../assets/profileimage.png'),
-      activeBadge: require('../assets/activeBadge.png'),
-    },
-    {
-      id: 3,
-      Name: "Theresa ",
-      TextDemo: "Okay, i’ll work on it when it’s...",
-      Time: "06.21",
-      masgCOunt: "4",
-      MassageBadge: require("../assets/massageBadge.png"),
-      profileImage: require('../assets/profileimage.png'),
-      activeBadge: require('../assets/activeBadge.png'),
-    },
+const Chat = ({ navigation }) => {
+  const [connectedUsers, setConnectedUsers] = useState([]);
+  const [lastMessageTimes, setLastMessageTimes] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [searchText, setSearchText] = useState('');
+  const [allUsers, setAllUsers] = useState([]);
 
-  ]
-  const [fontsLoaded] = useFonts({
-    Urbanist_300Light,
-    Urbanist_400Regular,
-    Urbanist_500Medium,
-    Urbanist_600SemiBold,
-    Urbanist_700Bold,
-  });
+  const fetchConnectedUsers = async () => {
+    try {
+      const db = firebase.firestore();
+      const currentUserID = firebase.auth().currentUser.uid;
+      const userDataCollection = db.collection('UserData');
+      const usersSnapshot = await userDataCollection.get();
+      const usersData = usersSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setAllUsers(usersData);
+      setConnectedUsers(usersData);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching connected users:', error);
+      setLoading(false);
+    }
+  };
+
+  const fetchLastMessageTimes = async () => {
+    try {
+      const db = firebase.firestore();
+      const currentUserID = firebase.auth().currentUser.uid;
+      const userTimestamps = {};
+
+      if (connectedUsers.length > 0) {
+        const lastMessagesPromises = connectedUsers.map(async (user) => {
+          const chatRoomId = [currentUserID, user.id].sort().join('_');
+          const chatRef = db.collection('chats').doc(chatRoomId).collection('messages');
+
+          const lastMessage = await chatRef.orderBy('createdAt', 'desc').limit(1).get();
+          const lastMessageData = lastMessage.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))[0];
+
+          if (lastMessageData) {
+            userTimestamps[user.id] = lastMessageData.createdAt.toDate();
+            userTimestamps[user.id + '_message'] = lastMessageData.text;
+          } else {
+            userTimestamps[user.id] = null;
+            userTimestamps[user.id + '_message'] = null;
+          }
+        });
+
+        await Promise.all(lastMessagesPromises);
+        setLastMessageTimes(userTimestamps);
+      }
+    } catch (error) {
+      console.error('Error fetching last message timestamps:', error);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setLoading(true);
+      fetchConnectedUsers();
+      setLoading(false);
+    }, [])
+  );
 
   useEffect(() => {
-    SplashScreen.preventAutoHideAsync();
-
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
+    if (connectedUsers.length > 0) {
+      fetchLastMessageTimes();
     }
-  }, [fontsLoaded]);
+  }, [connectedUsers]);
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  const formatLastMessage = (timestamp, userId) => {
+    const lastMessage = lastMessageTimes[userId + '_message'];
+    return lastMessage
+  };
+  const handleChatroom = async (otherUserUID, userName) => {
+    try {
+      navigation.navigate('UserChat', { otherUserUID, userName });
+    } catch (error) {
+      console.error('Error handling chatroom:', error);
+    }
+  };
 
-  const ProfileList = () => {
+  const handleSearch = (text) => {
+    setSearchText(text);
+    const filteredUsers = allUsers.filter(
+      (user) =>
+        user.firstName.toLowerCase().includes(text.toLowerCase()) ||
+        user.lastName.toLowerCase().includes(text.toLowerCase())
+    );
+    setConnectedUsers(filteredUsers);
+  };
+
+  useEffect(() => {
+    setConnectedUsers(allUsers);
+  }, [allUsers]);
+
+  if (loading) {
     return (
-      Array.map((element) => {
-        return (
-
-          <TouchableOpacity key={element.id} style={{ flexDirection: "column", marginLeft: 21 }}
-            onPress={() => navigation.navigate('userChating')}
-          >
-
-            <View style={{ flexDirection: "row", }}>
-              <Image
-                source={element.profileImage}
-                style={styles.profileimage}
-              />
-              <Text style={styles.name}>{element.Name}</Text>
-              <Text style={styles.time}>{element.Time}</Text>
-
-            </View>
-
-            <View>
-              <Image
-                source={element.activeBadge}
-                style={styles.activeBadge}
-              />
-              <Text style={styles.massagetxt}>
-                Okay, i’ll work on it when it’s...
-              </Text>
-              <Image
-                source={element.MassageBadge}
-                style={styles.massagebadge}
-              />
-              <Text style={styles.masgbadgetxt}>{element.masgCOunt}</Text>
-            </View>
-
-          </TouchableOpacity>
-        )
-      })
-    )
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
   }
+
+  const connectedUsersWithMessages = connectedUsers
+    .filter(user => lastMessageTimes[user.id])
+    .sort((userA, userB) => {
+      const timestampA = lastMessageTimes[userA.id];
+      const timestampB = lastMessageTimes[userB.id];
+      if (timestampA && timestampB) {
+        return timestampB - timestampA; // Sort in descending order of timestamps
+      }
+      return 0;
+    });
+
+  const handleProfileImage = async (userId) => {
+    const profileImageUrl = await fetchUserProfileImage(userId);
+    return profileImageUrl;
+  };
+
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
       <View style={styles.header}>
         <Text style={styles.headertxt}>Messages</Text>
       </View>
-      <View style={{ flexDirection: 'row' }}>
+      <View style={{ flexDirection: 'row', marginTop: 20 }}>
         <TextInput
-          placeholder='Search...'
+          placeholder='Search something here'
           style={styles.searchbar}
+          onChangeText={handleSearch}
+          value={searchText}
         />
         <Image
           source={require('../assets/Searchicon.png')}
           style={styles.searbaricon}
         />
       </View>
-      <View style={{ marginTop: 20, }}>
-        <ProfileList />
-      </View>
+      <FlatList
+        data={connectedUsersWithMessages}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => handleChatroom(item.id, `${item.firstName} ${item.lastName}`)}
+            style={styles.userItem}
+          >
+            <View>
+              <Image
+                source={item.profileImage ? { uri: item.profileImage } : require('../assets/profileimage.png')}
+                style={styles.userImage}
+              />
+            </View>
+            <View style={styles.userInfo}>
+              <View style={styles.userNameTime}>
+                <Text style={{ fontWeight: "500" }}>{item.firstName} {item.lastName}</Text>
+                <Text style={{ color: "#8391A1" }}>
+                  {lastMessageTimes[item.id] ? (
+                    new Date(lastMessageTimes[item.id]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
+                  ) : (
+                    ''
+                  )}
+                </Text>
+              </View>
+              {lastMessageTimes[item.id] ? (
+                <Text style={{ color: "#8391A1" }}>{formatLastMessage(lastMessageTimes[item.id], item.id)}</Text>
+              ) : (
+                <Text>No messages</Text>
+              )}
+            </View>
+          </TouchableOpacity>
+        )}
+        keyExtractor={(item) => item.id}
+      />
     </SafeAreaView>
+  );
+};
 
-  )
-}
-
-export default Chat
+export default Chat;
 
 const styles = StyleSheet.create({
   header: {
     height: 60,
-    width: "100%",
+    width: '100%',
     backgroundColor: 'white',
     borderTopStartRadius: 8,
     borderTopRightRadius: 8,
-    justifyContent: "center",
-    borderBottomWidth: 3,
-    borderColor: "#e1ebe4"
-
+    justifyContent: 'center',
+    borderColor: '#e1ebe4',
+    elevation: 2,
   },
   headertxt: {
-    alignSelf: "center",
     fontSize: 20,
-    fontWeight: "600",
-    fontFamily:"Urbanist_600SemiBold"
+    fontWeight: '600',
+    fontFamily: 'Urbanist_500Medium',
+    alignSelf: "center"
   },
   searchbar: {
-    marginLeft: 20,
-    height: 45,
-    width: '90%',
-    backgroundColor: '#EDEEEF',
-    marginTop: 13,
+    marginLeft: 16,
+    height: 37,
+    width: '92%',
+    backgroundColor: '#E8ECF4',
     borderRadius: 8,
     paddingLeft: 40,
-    backgroundColor: "#E8ECF4"
   },
   searbaricon: {
     height: 14,
     width: 14,
     position: 'absolute',
-    left: 35,
-    marginTop: 28
+    left: 38,
+    marginTop: 12
   },
-  filtericon: {
-    width: 39,
-    height: 36,
-    marginTop: 13,
+  userItem: {
+    flexDirection: "row",
+    marginTop: 30,
+    backgroundColor: "#f2f1eb",
+    elevation: 1,
+    borderRadius: 8,
+    width: "92%",
+    alignSelf: "center"
   },
-  activeBadge: {
-    height: 16,
-    width: 16,
-    position: "absolute",
-    bottom: 15,
-    marginLeft: 30
-
-  },
-  massagebadge: {
-    height: 16,
-    width: 15.5,
-    position: "absolute", right: 20, bottom: 25
-  },
-  massagetxt: {
-    marginLeft: 60,
-    bottom: 25,
-    fontSize: 13,
-    fontWeight: "400",
-    color: "#8391A1",
-    fontFamily:"Urbanist_400Regular"
-
-  },
-  name: {
-    marginLeft: 10,
-    fontSize: 15,
-    fontWeight: "500",
+  userImage: {
+    height: 50,
+    width: 50,
+    marginLeft: 5,
     marginTop: 5,
-    fontFamily:"Urbanist_500Medium"
+    borderRadius: 50
   },
-  time: {
-    position: "absolute",
-    right: 20,
-    color: "#8391A1",
-    fontWeight: "600",
-    fontFamily:"Urbanist_600SemiBold"
+  userInfo: {
+    width: '80%',
+    padding: 10,
+    elevation: 1
   },
-
-  masgbadgetxt:
-  {
-    position: "absolute",
-    right: 25,
-    bottom: 26,
-    fontSize: 10,
-    color: "white",
-    fontWeight: "bold"
+  userNameTime: {
+    flexDirection: "row",
+    justifyContent: "space-between"
   }
-})
+});

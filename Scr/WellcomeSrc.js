@@ -50,9 +50,9 @@ const WellcomeSrc = ({ navigation, route }) => {
         style={styles.loginbtn}
         onPress={() => {
           if (user) {
-            navigation.navigate('login');
-          } else {
             navigation.navigate('Tabs');
+          } else {
+            navigation.navigate('login');
           }
         }}
       >

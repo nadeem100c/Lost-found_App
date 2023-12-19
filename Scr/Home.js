@@ -1,17 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import {
-    View, Text, TouchableOpacity, Image, TextInput, ScrollView, StyleSheet,
+    View,
+    Text,
+    TouchableOpacity,
+    Image,
+    TextInput,
+    ScrollView,
+    StyleSheet,
 } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import Jewelry from './Jewelry';
 import ButtonList from './ButtonList';
+import AllAds from './AllAds.js';
 import ElectronicsScreen from './ElectronicsScreen';
 import GlassesScreen from './GlassesScreen';
 import BagsScreen from '../Scr/BagsScreen';
 import WelletScreen from '../Scr/WelletScreen';
-import { Picker } from '@react-native-picker/picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, } from '@react-navigation/native';
+import CountryPicker from 'react-native-country-picker-modal';
+import { firebase } from '../config.js';
+
 import {
     useFonts,
     Urbanist_300Light,
@@ -22,16 +31,23 @@ import {
 } from '@expo-google-fonts/urbanist'
 
 
-const Home = () => {
-    const [selectedValue, setSelectedValue] = useState('Pakistan');
-    const [activeScreen, setActiveScreen] = useState("Electronic");
+const Home = ({ route }) => {
+    const [country, setCountry] = useState({});
+    const { searchType, category, location } = route.params || {};
+    const [activeScreen, setActiveScreen] = useState("AllAds");
+    const [searchQuery, setSearchQuery] = useState('');
+    const [modalVisible, setModalVisible] = useState(false);
+    const [fetchedItems, setFetchedItems] = useState([]);
+
+
+
+
     const navigation = useNavigation()
+
     const handleButtonPress = (screenName) => {
         setActiveScreen(screenName);
     };
-    const handleValueChange = (itemValue) => {
-        setSelectedValue(itemValue);
-    };
+
     const [fontsLoaded] = useFonts({
         Urbanist_300Light,
         Urbanist_400Regular,
@@ -39,6 +55,80 @@ const Home = () => {
         Urbanist_600SemiBold,
         Urbanist_700Bold,
     });
+    useEffect(() => {
+
+        const fetchData = async () => {
+            try {
+                let collectionRef;
+                if (searchType === 'Lost' || searchType === 'Found') {
+
+                    collectionRef = firebase
+                        .firestore().collection('lostItems').where('type', '==', searchType);
+                } else {
+
+                    collectionRef = firebase.firestore().collection('lostItems');
+                }
+
+                const snapshot = await collectionRef.get();
+                const items = [];
+                snapshot.forEach((doc) => {
+                    items.push({ id: doc.id, ...doc.data() });
+                });
+
+                setFetchedItems(items);
+            } catch (error) {
+                console.error('Error fetching data: ', error);
+            }
+        };
+
+        fetchData();
+    }, [searchType]);
+
+    useEffect(() => {
+        if (searchType) {
+            switch (searchType.toLowerCase()) {
+                case 'electronics':
+                    setActiveScreen('Electronic');
+                    break;
+                case 'bags':
+                    setActiveScreen('Bag');
+                    break;
+                case 'wallet':
+                    setActiveScreen('Wellet');
+                    break;
+                case 'glasses':
+                    setActiveScreen('Glasses');
+                    break;
+                default:
+                    setActiveScreen('AllAds');
+                    break;
+            }
+        }
+
+        if (category) {
+            switch (category.toLowerCase()) {
+                case 'bag':
+                    setActiveScreen('Bag');
+                    break;
+                case 'wallet':
+                    setActiveScreen('Wellet');
+                    break;
+                case 'electronic':
+                    setActiveScreen('Electronic');
+                    break;
+                case 'jewelry':
+                    setActiveScreen('jewelry');
+                    break;
+                case 'glasses':
+                    setActiveScreen('Glasses');
+                    break;
+                default:
+                    setActiveScreen('AllAds');
+                    break;
+            }
+        }
+    }, [searchType, category]);
+
 
     useEffect(() => {
         SplashScreen.preventAutoHideAsync();
@@ -53,30 +143,102 @@ const Home = () => {
     }
 
 
+    const handleSearch = (text) => {
+        const trimmedQuery = text.trim().toLowerCase();
+        let filteredItems = [];
+
+        switch (activeScreen) {
+            case 'AllAds':
+                filteredItems = fetchedItems.filter(item =>
+                    item.category.toLowerCase().includes(trimmedQuery) ||
+                    item.location.toLowerCase().includes(trimmedQuery)
+                );
+                break;
+            case 'Electronic':
+
+                // filteredItems = electronicItems.filter(item =>
+                //     item.category.toLowerCase().includes(trimmedQuery) ||
+                //     item.location.toLowerCase().includes(trimmedQuery)
+                // );
+                break;
+            case 'jewelry':
+                // Implement filtering logic for 'jewelry' screen based on your data source
+                // Example:
+                // filteredItems = jewelryItems.filter(item =>
+                //     item.category.toLowerCase().includes(trimmedQuery) ||
+                //     item.location.toLowerCase().includes(trimmedQuery)
+                // );
+                break;
+            case 'Wellet':
+                // Implement filtering logic for 'Wellet' screen based on your data source
+                // Example:
+                // filteredItems = walletItems.filter(item =>
+                //     item.category.toLowerCase().includes(trimmedQuery) ||
+                //     item.location.toLowerCase().includes(trimmedQuery)
+                // );
+                break;
+            case 'Bag':
+                // Implement filtering logic for 'Bag' screen based on your data source
+                // Example:
+                // filteredItems = bagItems.filter(item =>
+                //     item.category.toLowerCase().includes(trimmedQuery) ||
+                //     item.location.toLowerCase().includes(trimmedQuery)
+                // );
+                break;
+            case 'Glasses':
+                // Implement filtering logic for 'Glasses' screen based on your data source
+                // Example:
+                // filteredItems = glassesItems.filter(item =>
+                //     item.category.toLowerCase().includes(trimmedQuery) ||
+                //     item.location.toLowerCase().includes(trimmedQuery)
+                // );
+                break;
+            default:
+                break;
+
+        }
+
+
+        setFetchedItems(filteredItems);
+    };
+
+
+    const onSelectCountry = (selectedCountry) => {
+        setCountry(selectedCountry);
+        setModalVisible(false);
+    };
     return (
         <View style={{ flex: 1, backgroundColor: 'white' }}>
             <SafeAreaView >
                 <Text style={styles.locationtxt}>Location</Text>
                 <View style={{ flexDirection: 'row', }}>
-                    <View style={{ left: 16}}>
-                        <Text style={styles.pickerValue} > {selectedValue}</Text>
-                    </View>
-
-                    <View style={styles.picker}>
-                        <Picker
-                            selectedValue={selectedValue}
-                            onValueChange={handleValueChange}
-                            mode="dropdown"
-                            style={{ fontFamily: "Urbanist_500Medium" }}
+                    <View style={{ marginLeft: 20, marginVertical: 5, flexDirection: "row" }}>
+                        <CountryPicker
+                            visible={modalVisible}
+                            onClose={() => setModalVisible(false)}
+                            withCountryNameButton
+                            onSelect={onSelectCountry}
+                            countryCode={country.cca2}
+                            withFlagButton={false}
+                            withFilter
+                            withAlphaFilter
+                            translation='eng'
+                            closeable
+                        />
+                        <TouchableOpacity onPress={() => setModalVisible(!modalVisible)}>
+                            <Text style={{ fontSize: 20, fontWeight: "600" }}>{country.name}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => setModalVisible(!modalVisible)}
+                            style={{ marginLeft: "5%", }}
                         >
-                            <Picker.Item label="Pakistan" value="Pakistan" />
-                            <Picker.Item label="China" value="China" />
-                            <Picker.Item label="America" value="America" />
-                            <Picker.Item label="Africa" value="Africa" />
-                            <Picker.Item label="Qatar" value="Qatar" />
-
-                        </Picker>
+                            <Image
+                                source={require('../assets/drop.png')}
+                                style={{ height: 20, width: 20, marginTop: 7, bottom: 6 }}
+                            />
+                        </TouchableOpacity>
                     </View>
+
 
                     <View style={styles.notificationiconView}>
                         <TouchableOpacity onPress={() => navigation.navigate("notications")}>
@@ -87,19 +249,29 @@ const Home = () => {
                         </TouchableOpacity>
                     </View>
                 </View>
-                <TouchableOpacity style={styles.overlayContainer}
-                    onPress={() => navigation.navigate("mapSrc")}
-                >
-                    <Image
-                        source={require('../assets/Locationbtn.png')}
-                        style={styles.Mapbtn}
-                    />
-                </TouchableOpacity  >
+
                 <View style={{ flexDirection: 'row' }}>
 
                     <TextInput
                         placeholder='Search something here'
-                        style={styles.searchbar} />
+                        style={styles.searchbar}
+                        onChangeText={(text) => {
+                            setSearchQuery(text);
+                            handleSearch(text);
+                        }}
+                        value={searchQuery}
+                        returnKeyType='search'
+                    />
+
+
+                    {searchQuery.length > 0 && (
+                        <TouchableOpacity onPress={() => setSearchQuery('')} style={{ width: 5 }}>
+                            <Image
+                                source={require('../assets/crossicon.png')}
+                                style={styles.clearIcon}
+                            />
+                        </TouchableOpacity>
+                    )}
                     <Image
                         source={require('../assets/Searchicon.png')}
                         style={styles.searbaricon} />
@@ -112,16 +284,18 @@ const Home = () => {
 
                 <View style={{ marginLeft: 16, marginTop: 11 }}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                        <ButtonList onPress={handleButtonPress} />
+                        <ButtonList onPress={handleButtonPress} searchType={searchType} category={category} activeScreen={activeScreen} />
                     </ScrollView>
+
                 </View>
 
                 <View style={{ marginLeft: 16, marginTop: 20 }}>
-                    {activeScreen === 'Electronic' && <ElectronicsScreen />}
-                    {activeScreen === 'jewelry' && <Jewelry />}
-                    {activeScreen === 'Bag' && <BagsScreen />}
-                    {activeScreen === 'Wellet' && <WelletScreen />}
-                    {activeScreen === 'Glasses' && <GlassesScreen />}
+                    {activeScreen === 'AllAds' && <AllAds searchQuery={searchQuery} searchType={searchType} category={category} />}
+                    {activeScreen === 'Electronic' && <ElectronicsScreen searchQuery={searchQuery} searchType={searchType} category={category} />}
+                    {activeScreen === 'jewelry' && <Jewelry searchQuery={searchQuery} searchType={searchType} category={category} />}
+                    {activeScreen === 'Bag' && <BagsScreen searchQuery={searchQuery} searchType={searchType} category={category}  />}
+                    {activeScreen === 'Wellet' && <WelletScreen searchQuery={searchQuery} searchType={searchType} category={category} />}
+                    {activeScreen === 'Glasses' && <GlassesScreen searchQuery={searchQuery} searchType={searchType} category={category} />}
                 </View>
             </SafeAreaView>
         </View>
@@ -184,20 +358,34 @@ const styles = StyleSheet.create({
     notificationiconView: {
         flex: 1,
         alignItems: 'flex-end',
-        marginTop: 10
+
     },
     Mapbtn: {
         height: 60,
         width: 60,
-        position: 'absolute',
-        top: 110,
-        left: 20,
-        bottom: "15%"
     },
     overlayContainer: {
-        position: 'absolute',
-        top: 570,
-        left: "76%",
+        alignSelf: "baseline",
         zIndex: 1,
+
+    },
+    clearIcon: {
+        height: 16,
+        width: 16,
+        right: 20,
+        marginTop: 10
+    },
+    modalContainer: {
+
+    },
+    modalContent: {
+
+    },
+    modal: {
+
+    },
+    countryPickerButton: {
+
+
     },
 });
